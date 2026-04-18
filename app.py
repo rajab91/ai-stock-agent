@@ -6,6 +6,34 @@ from ta.trend import MACD
 import plotly.graph_objects as go
 import requests
 
+# ================= AI (OPENROUTER) =================
+def ask_ai_openrouter(prompt):
+    API_KEY = st.secrets["OPENROUTER_API_KEY"]  # 🔑 secure key
+
+    url = "https://openrouter.ai/api/v1/chat/completions"
+
+    headers = {"Authorization": f"Bearer {API_KEY}", "Content-Type": "application/json"}
+
+    data = {
+        "model": "openai/gpt-3.5-turbo",
+        "messages": [{"role": "user", "content": prompt}],
+        "max_tokens": 120,  # ✅ cost + speed control
+    }
+
+    try:
+        response = requests.post(url, headers=headers, json=data)
+        response_json = response.json()
+
+        # ✅ Handle API errors cleanly
+        if "error" in response_json:
+            return f"⚠️ AI error: {response_json['error']['message']}"
+
+        return response_json["choices"][0]["message"]["content"]
+
+    except Exception as e:
+        return "⚠️ AI temporarily unavailable"
+
+
 st.set_page_config(layout="wide")
 
 # =========================
@@ -211,20 +239,27 @@ with tab3:
         st.session_state.chat_history.append({"role": "User", "content": user_input})
 
         prompt = f"""
+Act like a professional Indian stock trader.
+
+Use:
+- Breakout status
+- Prediction (UP/DOWN)
+- Trend logic
+
+Be decisive:
+- Say BUY / SELL / WAIT
+- Give 1–2 line reason
+- Mention risk level (Low/Medium/High)
+
 Stock: {stock_input}
 Breakout: {breakout}
 Prediction: UP {up}% DOWN {down}%
-Question: {user_input}
+
+User Question:
+{user_input}
 """
 
-        try:
-            response = requests.post(
-                "http://localhost:11434/api/generate",
-                json={"model": "phi3", "prompt": prompt, "stream": False},
-            )
-            result = response.json()["response"]
-        except:
-            result = "⚠️ Ollama not running"
+        result = ask_ai_openrouter(prompt)
 
         st.session_state.chat_history.append({"role": "AI", "content": result})
         st.rerun()
@@ -626,37 +661,27 @@ Breakout: {breakout}
 """
 
         prompt = f"""
-You are an expert Indian stock market trader.
+You are a professional Indian stock market trader.
 
-Analyze the stock using:
+Analyze using:
 - Price action
 - RSI
 - MACD
 - Support/Resistance
 - Breakout signals
 
-Provide:
-1. Clear trading view (Bullish/Bearish/Sideways)
-2. Entry suggestion
-3. Risk (stop loss)
-4. Short explanation (simple English)
+Give structured output:
 
-Context:
-{context}
+1. Trend: (Bullish / Bearish / Sideways)
+2. Action: (BUY / SELL / WAIT)
+3. Entry: (price range)
+4. Stop Loss: (strict level)
+5. Risk Level: (Low / Medium / High)
+6. Reason: (2–3 lines simple explanation)
 
-User Question:
-{user_q}
-"""
+Be confident and practical. Avoid generic advice."""
 
-        try:
-            response = requests.post(
-                "http://localhost:11434/api/generate",
-                json={"model": "phi3", "prompt": prompt, "stream": False},
-            )
-            result = response.json()["response"]
-        except:
-            result = "⚠️ Ollama not running"
-
+        result = ask_ai_openrouter(prompt)
         st.session_state.chat_pro.append({"role": "User", "content": user_q})
         st.session_state.chat_pro.append({"role": "AI", "content": result})
 
