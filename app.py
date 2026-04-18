@@ -649,14 +649,14 @@ with tab8:
 
     if submit and user_q:
 
-        context = f"""
+       context = f"""
 Stock: {stock_input}
-Price: {latest['Close']:.2f}
-RSI: {latest['RSI']:.2f}
-MACD: {latest['MACD']:.2f}
-Trend: {"Uptrend" if latest["Close"] > latest["MA20"] else "Downtrend"}
-Support: {support:.2f}
-Resistance: {resistance:.2f}
+Price: {float(latest['Close']) if latest['Close'] is not None else 0:.2f}
+RSI: {float(latest['RSI']) if latest['RSI'] is not None else 0:.2f}
+MACD: {float(latest['MACD']) if latest['MACD'] is not None else 0:.2f}
+Trend: {"Uptrend" if float(latest['Close']) > float(latest['MA20']) else "Downtrend"}
+Support: {float(support):.2f}
+Resistance: {float(resistance):.2f}
 Breakout: {breakout}
 """
 
