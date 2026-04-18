@@ -649,7 +649,7 @@ with tab8:
 
     if submit and user_q:
 
-       context = f"""
+        context = f"""
 Stock: {stock_input}
 Price: {float(latest['Close']) if latest['Close'] is not None else 0:.2f}
 RSI: {float(latest['RSI']) if latest['RSI'] is not None else 0:.2f}
@@ -679,9 +679,17 @@ Give structured output:
 5. Risk Level: (Low / Medium / High)
 6. Reason: (2–3 lines simple explanation)
 
-Be confident and practical. Avoid generic advice."""
+Be confident and practical. Avoid generic advice.
+
+Context:
+{context}
+
+User Question:
+{user_q}
+"""
 
         result = ask_ai_openrouter(prompt)
+
         st.session_state.chat_pro.append({"role": "User", "content": user_q})
         st.session_state.chat_pro.append({"role": "AI", "content": result})
 
