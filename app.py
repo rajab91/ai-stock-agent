@@ -649,11 +649,26 @@ with tab8:
 
     if submit and user_q:
 
-        # ✅ FIXED INDENTATION
-        price_val = float(latest["Close"]) if pd.notna(latest["Close"]) else 0
-        rsi_val = float(latest["RSI"]) if pd.notna(latest["RSI"]) else 0
-        macd_val = float(latest["MACD"]) if pd.notna(latest["MACD"]) else 0
-        ma20_val = float(latest["MA20"]) if pd.notna(latest["MA20"]) else 0
+        # ✅ SAFE VALUE EXTRACTION (NO ERRORS)
+        try:
+            price_val = float(latest["Close"])
+        except:
+            price_val = 0
+
+        try:
+            rsi_val = float(latest["RSI"])
+        except:
+            rsi_val = 0
+
+        try:
+            macd_val = float(latest["MACD"])
+        except:
+            macd_val = 0
+
+        try:
+            ma20_val = float(latest["MA20"])
+        except:
+            ma20_val = 0
 
         trend_val = "Uptrend" if price_val > ma20_val else "Downtrend"
 
