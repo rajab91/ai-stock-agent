@@ -649,12 +649,20 @@ with tab8:
 
     if submit and user_q:
 
+        # ✅ FIXED INDENTATION
+        price_val = float(latest["Close"]) if pd.notna(latest["Close"]) else 0
+        rsi_val = float(latest["RSI"]) if pd.notna(latest["RSI"]) else 0
+        macd_val = float(latest["MACD"]) if pd.notna(latest["MACD"]) else 0
+        ma20_val = float(latest["MA20"]) if pd.notna(latest["MA20"]) else 0
+
+        trend_val = "Uptrend" if price_val > ma20_val else "Downtrend"
+
         context = f"""
 Stock: {stock_input}
-Price: {float(latest['Close']) if latest['Close'] is not None else 0:.2f}
-RSI: {float(latest['RSI']) if latest['RSI'] is not None else 0:.2f}
-MACD: {float(latest['MACD']) if latest['MACD'] is not None else 0:.2f}
-Trend: {"Uptrend" if float(latest['Close']) > float(latest['MA20']) else "Downtrend"}
+Price: {price_val:.2f}
+RSI: {rsi_val:.2f}
+MACD: {macd_val:.2f}
+Trend: {trend_val}
 Support: {float(support):.2f}
 Resistance: {float(resistance):.2f}
 Breakout: {breakout}
